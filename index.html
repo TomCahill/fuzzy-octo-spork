@@ -1,0 +1,27 @@
+<html>
+  <head>
+    <title>Fuzzy Octo Spork</title>
+
+    <link rel="stylesheet" href="./css/app.css"/>
+
+    <script type="text/javascript" src="./js/helpers.js"></script>
+    <script type="text/javascript" src="./js/canvas.js"></script>
+    <script type="text/javascript" src="./js/viewport.js"></script>
+    <script type="text/javascript" src="./js/input.js"></script>
+    <script type="text/javascript" src="./js/level.js"></script>
+    <script type="text/javascript" src="./js/object.js"></script>
+    <script type="text/javascript" src="./js/block.js"></script>
+    <script type="text/javascript" src="./js/player.js"></script>
+    <script type="text/javascript" src="./js/game.js"></script>
+  </head>
+  <body>
+    <canvas id="game-main-frame"></canvas>
+    <script type="text/javascript">
+      (function(){
+        window.onload = function(){
+          new Game('game-main-frame');
+        };
+      })();
+    </script>
+  </body>
+</html>

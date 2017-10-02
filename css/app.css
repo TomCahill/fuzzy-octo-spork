@@ -1,0 +1,24 @@
+html, body {
+  background: #000;
+  width: 100vw;
+  height: 100vh;
+
+  margin: 0px;
+  padding: 0px;
+
+  overflow: hidden;
+}
+
+canvas {
+  background: #000;
+  width: 100vw;
+  height: 100vh;
+
+  backface-visibility: hidden;
+
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -o-crisp-edges;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  -ms-interpolation-mode: nearest-neighbor;
+}
