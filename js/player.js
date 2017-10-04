@@ -25,7 +25,7 @@ class Player extends Block { // eslint-disable-line no-unused-vars
    *
    */
   update(delta) {
-    super.update();
+    super.update(delta);
     
     let v = this.velocity;
 
@@ -36,6 +36,25 @@ class Player extends Block { // eslint-disable-line no-unused-vars
       v.x -= v.x * this.drag;
     }
     
+    const idxPos = (x, y) => {
+      return (Math.floor(y / 32) * 60) + Math.floor(x / 32);
+    };
+
+    const sideIdx = {
+      top: idxPos(this.position.x, this.position.y),
+      bottom: idxPos(this.position.x, this.position.y + this.size.y),
+      left: idxPos(this.position.x, this.position.y),
+      right: idxPos(this.position.x + this.size.x, this.position.y)
+    };
+
+    if (this.level.collisionMap[sideIdx.bottom] === 1) {
+      if (v.y > this.size.y) {
+        v.y *= -this.bounce;
+      } else {
+        v.y = 0;
+      }
+    }
+
     if (this.input.UP) {
       // v.y -= this.speed.y;
       if (v.y === 0) {
