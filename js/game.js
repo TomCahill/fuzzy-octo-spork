@@ -29,7 +29,7 @@ class Game { // eslint-disable-line no-unused-vars
     this._fps = 0;
 
     this._assets = [
-      {path: '/data/tilemaps/test.png', type: 'image'},
+      {path: 'data/tilemaps/test.png', type: 'image'},
     ];
     this._preloadLoaded = false;
     this._preloadProgress = 0;
