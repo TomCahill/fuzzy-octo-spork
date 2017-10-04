@@ -37,7 +37,7 @@
  "tilesets":[
         {
          "firstgid":1,
-         "image":"\/data\/tilemaps\/test.png",
+         "image":"data\/tilemaps\/test.png",
          "imageheight":320,
          "imagewidth":320,
          "margin":0,
