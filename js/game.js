@@ -28,7 +28,9 @@ class Game { // eslint-disable-line no-unused-vars
     this._frameRate = 0;
     this._fps = 0;
 
-    this._assets = [];
+    this._assets = [
+      {path: '/data/tilemaps/test.png', type: 'image'},
+    ];
     this._preloadLoaded = false;
     this._preloadProgress = 0;
 
@@ -108,7 +110,7 @@ class Game { // eslint-disable-line no-unused-vars
     const now = new Date();
 
     if ((now - this._lastTick) > this._tickRate) {
-      this._deltaTime = Math.min(1, (now - this._lastTick) / 1000);
+      this._deltaTime = (now - this._lastTick) / 1000;
       try {
         this._update(this._deltaTime);
       } catch(e) {
