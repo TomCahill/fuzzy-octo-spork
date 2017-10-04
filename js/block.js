@@ -20,7 +20,7 @@ class Block extends Object { // eslint-disable-line no-unused-vars
    *
    */
   update(delta) {
-    super.update();
+    super.update(delta);
   }
 
   /**

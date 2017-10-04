@@ -22,7 +22,9 @@ class Level { // eslint-disable-line no-unused-vars
     this._levelLoaded = false;
     this._postRenderLayer = null;
 
-    this.startPosition = new Vector2(160, 160);
+    this.startPosition = new Vector2(160, 220);
+
+    this.collisionMap = [];
     
     this.layer = {
       size: new Vector2(1000, 100),
@@ -105,6 +107,12 @@ class Level { // eslint-disable-line no-unused-vars
 
     // Parse out object layers
     return data.layers.reduce((layers, layer) => {
+      if (layer.properties) {
+        if (layer.properties.collision) {
+          this.collisionMap = layer.data.map((i) => (i > 0) ? 1 : 0);
+        }
+      }
+
       layers.push(layer);
       return layers;
     }, []);
@@ -169,13 +177,14 @@ class Level { // eslint-disable-line no-unused-vars
       let postion = new Vector2(0, 0);
       let tilemap = new Vector2(0, 0);
 
-      postion.x = (i % ((this._levelData.width*tileSize) / tileSize)) * tileSize;
-      postion.y = ~~(i / ((this._levelData.width*tileSize) / tileSize)) * tileSize;
-      tilemap.x = ((layer.data[i]-1) % (tileset.imagewidth/tileSize)) * tileSize;
-      tilemap.y = ~~((layer.data[i]-1) / (tileset.imagewidth/tileSize)) * tileSize;
+      postion.x = (i % this._levelData.width) * tileSize;
+      postion.y = ~~(i / this._levelData.width) * tileSize;
+      tilemap.x = ((layer.data[i]-1) % tileset.imagewidth) * tileSize;
+      tilemap.y = ~~((layer.data[i]-1) / tileset.imagewidth) * tileSize;
 
       postion.x -= viewOffset.x;
       postion.y -= viewOffset.y;
+      
       context.drawImage(
         this._levelTileSet, // Image
         tilemap.x, // dX
