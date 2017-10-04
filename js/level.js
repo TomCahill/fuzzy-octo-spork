@@ -95,7 +95,7 @@ class Level { // eslint-disable-line no-unused-vars
    * @private
    */
   _parseLevel(data) {
-    console.log('Level:_parseLevel', data);
+    // console.log('Level:_parseLevel', data);
     this._levelData = data;
     this._levelTileSet = new Image();
     this._levelTileSet.src = this._levelData.tilesets[0].image;
@@ -146,7 +146,7 @@ class Level { // eslint-disable-line no-unused-vars
     if (!this._levelLoaded) {
       return;
     }
-
+    
     context.drawImage(this._canvasBuffer, -viewOffset.x, -viewOffset.y);
   }
 
@@ -159,46 +159,34 @@ class Level { // eslint-disable-line no-unused-vars
    */
   _renderLayer(layer, context, viewOffset) {
     let tileSize = this._levelData.tilewidth;
-    let tile = this._levelData.tilesets[0];
-
-    console.log(layer.name);
+    let tileset = this._levelData.tilesets[0];
 
     for (let i=0; i < layer.data.length; i++) {
       if (layer.data[i]<1) {
         continue;
       }
 
-      let img = new Vector2(0, 0);
-      let src = new Vector2(0, 0);
+      let postion = new Vector2(0, 0);
+      let tilemap = new Vector2(0, 0);
 
-      img.x = (i % ((this._levelData.width*tileSize) / tileSize)) * tileSize;
-      img.y = ~~(i / ((this._levelData.width*tileSize) / tileSize)) * tileSize;
-      src.x = ((layer.data[i]-1) % (tile.imagewidth/tileSize)) * tileSize;
-      src.y = ~~((layer.data[i]-1) / (tile.imagewidth/tileSize)) * tileSize;
+      postion.x = (i % ((this._levelData.width*tileSize) / tileSize)) * tileSize;
+      postion.y = ~~(i / ((this._levelData.width*tileSize) / tileSize)) * tileSize;
+      tilemap.x = ((layer.data[i]-1) % (tileset.imagewidth/tileSize)) * tileSize;
+      tilemap.y = ~~((layer.data[i]-1) / (tileset.imagewidth/tileSize)) * tileSize;
 
-      img.x -= viewOffset.x;
-      img.y -= viewOffset.y;
-
-      context.fillStyle = '#FF0000';
-      context.fillRect(
-        src.x,
-        src.y,
-        tileSize,
-        tileSize
+      postion.x -= viewOffset.x;
+      postion.y -= viewOffset.y;
+      context.drawImage(
+        this._levelTileSet, // Image
+        tilemap.x, // dX
+        tilemap.y, // dY
+        tileSize, // dWidth
+        tileSize, // dHeight
+        postion.x, // sX
+        postion.y, // sY
+        tileSize, // sWidth
+        tileSize // sHeight
       );
-
-      debugger;
-      // context.drawImage(
-      //   this._levelTileSet, // Image
-      //   src.x, // dX
-      //   src.y, // dY
-      //   tileSize, // dWidth
-      //   tileSize, // dHeight
-      //   img.x, // sX
-      //   img.y, // sY
-      //   tileSize, // sWidth
-      //   tileSize // sHeight
-      // );
     }
   }
 
