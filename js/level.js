@@ -56,7 +56,7 @@ class Level { // eslint-disable-line no-unused-vars
     this._levelName = leveName;
     return new Promise((resolve) => {
       let xhr = new XMLHttpRequest();
-      xhr.open('get', `/data/levels/${leveName}.json`, true);
+      xhr.open('get', `data/levels/${leveName}.json`, true);
       xhr.onreadystatechange = () => {
         if (xhr.readyState === XMLHttpRequest.DONE) {
           if (xhr.status === 200) {
