@@ -31,6 +31,12 @@ class Object { // eslint-disable-line no-unused-vars
     let v = this.velocity;
     v.y += this.gravity;
 
+
+    if (this.position.y > 1200) {
+      this.position.x = this.level.startPosition.x;
+      this.position.y = this.level.startPosition.y;
+    }
+
     this.velocity.x = v.x;
     this.velocity.y = v.y;
   }
