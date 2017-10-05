@@ -13,6 +13,22 @@ class Input { // eslint-disable-line no-unused-vars
     this.RIGHT = 0;
     this.SPRINT = 0;
 
+    this.keyboardMap = {
+      '87': 'UP',
+      '65': 'LEFT',
+      '83': 'DOWN',
+      '68': 'RIGHT',
+      '16': 'SPRINT',
+      '69': 'USE',
+    };
+    this.mobileMap = {
+      'movement-up': 'UP',
+      'movement-left': 'LEFT',
+      'movement-down': 'DOWN',
+      'movement-right': 'RIGHT',
+      'interaction-sprint': 'SPRINT',
+    };
+
     this._init();
   }
 
@@ -27,27 +43,58 @@ class Input { // eslint-disable-line no-unused-vars
 
   /**
    *
+   * @param {string} element - Mobile container element id
+   */
+  initMobileListeners(element) {
+    let buttons = document.getElementById(element).querySelectorAll('button');
+
+    let touchStartEvent = 'mousedown';
+    let touchEndEvent = 'mouseup';
+
+    if ('onpointerdown' in window) {
+      touchStartEvent = 'pointerdown';
+      touchEndEvent = 'pointerup';
+    } else if ('ontouchstart' in window) {
+      touchStartEvent = 'touchstat';
+      touchEndEvent = 'touchend';
+    }
+
+    buttons.forEach((button) => {
+      button.addEventListener(touchStartEvent, this._mouseDown.bind(this));
+      button.addEventListener(touchEndEvent, this._mouseUp.bind(this));
+    });
+  }
+
+  /**
+   *
+   * @param {object} ev - KeyboardEvent
+   * @private
+   */
+  _mouseDown(ev) {
+    let className = ev.target.className;
+    const input = this.mobileMap[className];
+    this[input] = 1;
+  }
+
+  /**
+   *
+   * @param {object} ev - KeyboardEvent
+   * @private
+   */
+  _mouseUp(ev) {
+    let className = ev.target.className;
+    const input = this.mobileMap[className];
+    this[input] = 0;
+  }
+
+  /**
+   *
    * @param {object} ev - KeyboardEvent
    * @private
    */
   _keyDown(ev) {
-    switch (ev.keyCode) {
-      case 87:
-        this.UP = 1;
-        break;
-      case 83:
-        this.DOWN = 1;
-        break;
-      case 65:
-        this.LEFT = 1;
-        break;
-      case 68:
-        this.RIGHT = 1;
-        break;
-      case 16:
-        this.SPRINT = 1;
-        break;
-    }
+    const input = this.keyboardMap[ev.keyCode];
+    this[input] = 1;
   }
 
   /**
@@ -56,23 +103,8 @@ class Input { // eslint-disable-line no-unused-vars
    * @private
    */
   _keyUp(ev) {
-    switch (ev.keyCode) {
-      case 87:
-        this.UP = 0;
-        break;
-      case 83:
-        this.DOWN = 0;
-        break;
-      case 65:
-        this.LEFT = 0;
-        break;
-      case 68:
-        this.RIGHT = 0;
-        break;
-      case 16:
-        this.SPRINT = 0;
-        break;
-    }
+    const input = this.keyboardMap[ev.keyCode];
+    this[input] = 0;
   }
 
 }

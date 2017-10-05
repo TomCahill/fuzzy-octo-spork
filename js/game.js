@@ -53,6 +53,8 @@ class Game { // eslint-disable-line no-unused-vars
 
     this.viewPort = new ViewPort(this.canvas.size, this.input);
 
+    this.input.initMobileListeners('mobile-controls');
+
     this.start();
   }
 
