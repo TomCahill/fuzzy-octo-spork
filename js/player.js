@@ -15,8 +15,10 @@ class Player extends Block { // eslint-disable-line no-unused-vars
 
     this.position = new Vector2(level.startPosition.x, level.startPosition.y);
 
-    this.speed = new Vector2(100, 5);
+    this.speed = new Vector2(this.size.x, 5);
     this.velocity = new Vector2(0, 0);
+
+    this.projected = new Vector2(0, 0);
 
     this.drag = 0.4;
   }
@@ -48,51 +50,6 @@ class Player extends Block { // eslint-disable-line no-unused-vars
       return (Math.floor(y / 32) * 60) + Math.floor(x / 32);
     };
 
-    const sideIdx = {
-      top: idxPos(this.position.x, this.position.y),
-      bottom: idxPos(this.position.x, this.position.y + this.size.y),
-      left: idxPos(this.position.x, this.position.y),
-      right: idxPos(this.position.x + this.size.x, this.position.y)
-    };  
-
-    if (this.level.collisionMap[sideIdx.top]) {
-      let colSideBottom = Math.floor(sideIdx.top / 60) * 32 + 32;
-      if (this.position.y < colSideBottom) {
-        this.position.y = colSideBottom;
-        v.y = 0;
-        return;
-      }
-    }
-    if (this.level.collisionMap[sideIdx.bottom] === 1) {
-      let colSideTop = Math.floor(sideIdx.bottom / 60) * 32 + 32;
-      if (v.y > this.size.y) {
-        v.y *= -this.bounce;
-      } else {
-        v.y = 0;
-      }
-      if (this.position.y > colSideTop) {
-        this.position.y = colSideTop;
-        v.y = 0;
-        return;
-      }
-    }
-    if (this.level.collisionMap[sideIdx.left]) {
-      let colSideRight = sideIdx.right % 60 * 32;
-      if (this.position.x < colSideRight) {
-        this.position.x = colSideRight;
-        v.x = 0;
-        return;
-      }
-    }
-    if (this.level.collisionMap[sideIdx.right]) {
-      let colSideLeft = sideIdx.right % 60 * 32 - 32;
-      if (this.position.x > colSideLeft) {
-        this.position.x = colSideLeft;
-        v.x = 0;
-        return;
-      }
-    }
-
     if (this.input.UP) {
       // v.y -= this.speed.y;
       if (v.y === 0) {
@@ -109,20 +66,47 @@ class Player extends Block { // eslint-disable-line no-unused-vars
       v.x += this.speed.x;
     }
 
-    this.position.x += v.x * delta; 
-    this.position.y += v.y * delta;
+    // Check prodicted path
+    
+    this.projected.x = this.position.x + (v.x * delta);
+    this.projected.y = this.position.y + (v.y * delta);
+
+    if (this.projected.y > 545) {
+      this.velocity.y = 0;
+    }
+
+    // this.position.x += v.x * delta; 
+    // this.position.y += v.y * delta;
   }
 
   /**
    *
    */
   render(context, viewOffset) {
+
+    this.__renderDebug(context, viewOffset);
+
     context.fillStyle = '#FFFF00';
     context.fillRect(
       this.position.x - viewOffset.x,
       this.position.y - viewOffset.y,
       this.size.x,
       this.size.y
+    );
+  }
+
+  __renderDebug(context, viewOffset) {
+    let posX = this.projected.x;
+    let posY = this.projected.y;
+    let vX =  this.size.x;
+    let vY =  this.size.y;
+
+    context.fillStyle = '#FF0000';
+    context.fillRect(
+      posX - viewOffset.x,
+      posY - viewOffset.y,
+      vX,
+      vY
     );
   }
 

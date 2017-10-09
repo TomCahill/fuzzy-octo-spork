@@ -17,7 +17,7 @@ class Object { // eslint-disable-line no-unused-vars
     this.speed = new Vector2(0, 0);
     this.velocity = new Vector2(0, 0);
 
-    this.gravity = 5;
+    this.gravity = 10;
     this.bounce = 0.3;
   }
 

@@ -184,7 +184,7 @@ class Level { // eslint-disable-line no-unused-vars
 
       postion.x -= viewOffset.x;
       postion.y -= viewOffset.y;
-      
+
       context.drawImage(
         this._levelTileSet, // Image
         tilemap.x, // dX
@@ -196,6 +196,14 @@ class Level { // eslint-disable-line no-unused-vars
         tileSize, // sWidth
         tileSize // sHeight
       );
+
+      context.lineWidth = '1px';
+      context.strokeStyle = '#FF0000';
+      context.strokeRect(postion.x, postion.y, tileSize, tileSize);
+
+      context.font = '12px Arial';
+      context.fillStyle = '#FFF';
+      context.fillText(i, postion.x + 5, postion.y + 15);
     }
   }
 
