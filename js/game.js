@@ -112,7 +112,7 @@ class Game { // eslint-disable-line no-unused-vars
     const now = new Date();
 
     if ((now - this._lastTick) > this._tickRate) {
-      this._deltaTime = Math.min(1, (now - this._lastTick) / 1000);
+      this._deltaTime = (now - this._lastTick) / 1000;
       try {
         this._update(this._deltaTime);
       } catch(e) {  
@@ -209,6 +209,7 @@ class Game { // eslint-disable-line no-unused-vars
 
     context.fillText(`Position: ${this.player.position}`, 20, 100);
     context.fillText(`Velocity: ${this.player.velocity}`, 20, 120);
+    context.fillText(`Projected: ${this.player.projected}`, 20, 140);
   }
 
 }

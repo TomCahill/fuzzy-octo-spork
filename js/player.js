@@ -1,35 +1,38 @@
 'use strict';
 
 /** Class Object */
-class Player extends Block { // eslint-disable-line no-unused-vars
+class Player { // eslint-disable-line no-unused-vars
 
   /**
    * Object constructor
    */
   constructor(input, level) {
     console.log('Player:constructor');
-    super();
 
     this.input = input;
     this.level = level;
 
     this.position = new Vector2(level.startPosition.x, level.startPosition.y);
+    this.size = new Vector2(32, 32);
 
-    this.speed = new Vector2(this.size.x, 5);
+    this.speed = new Vector2(5, 0.001);
     this.velocity = new Vector2(0, 0);
 
     this.projected = new Vector2(0, 0);
 
     this.drag = 0.4;
+    this.gravity = .5;
+    this.bounce = 0.3;
   }
 
   /**
    *
    */
   update(delta) {
-    super.update(delta);
+    // super.update(delta);
     
-    let v = this.velocity;
+    let v = new Vector2(this.velocity.x, this.velocity.y);
+    v.y += this.gravity;
 
     if(v.x > 0) {
       if (v.x > this.size.x) {
@@ -66,14 +69,16 @@ class Player extends Block { // eslint-disable-line no-unused-vars
       v.x += this.speed.x;
     }
 
-    // Check prodicted path
+    this.velocity.x += v.x * delta
+    this.velocity.y += v.y * delta
     
-    this.projected.x = this.position.x + (v.x * delta);
-    this.projected.y = this.position.y + (v.y * delta);
+    // Check prodicted path
+    this.projected.x = this.position.x + this.velocity.x;
+    this.projected.y = this.position.y + this.velocity.y;
 
-    if (this.projected.y > 545) {
+    if (this.projected.y > 300) {
       this.velocity.y = 0;
-    }
+    } 
 
     // this.position.x += v.x * delta; 
     // this.position.y += v.y * delta;
