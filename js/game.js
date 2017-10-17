@@ -209,7 +209,7 @@ class Game { // eslint-disable-line no-unused-vars
 
     context.fillText(`Position: ${this.player.position}`, 20, 100);
     context.fillText(`Velocity: ${this.player.velocity}`, 20, 120);
-    context.fillText(`Projected: ${this.player.projected}`, 20, 140);
+    // context.fillText(`Projected: ${this.player.projected}`, 20, 140);
   }
 
 }

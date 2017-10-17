@@ -15,13 +15,16 @@ class Player { // eslint-disable-line no-unused-vars
     this.position = new Vector2(level.startPosition.x, level.startPosition.y);
     this.size = new Vector2(32, 32);
 
-    this.speed = new Vector2(5, 0.001);
+    this.speed = new Vector2(5, 10);
     this.velocity = new Vector2(0, 0);
 
-    this.projected = new Vector2(0, 0);
+    this.maxSpeed = new Vector2(20, 60);
 
+    this.grounded = false;
+
+    this.jump = 300;
     this.drag = 0.4;
-    this.gravity = .5;
+    this.gravity = 5;
     this.bounce = 0.3;
   }
 
@@ -31,57 +34,69 @@ class Player { // eslint-disable-line no-unused-vars
   update(delta) {
     // super.update(delta);
     
-    let v = new Vector2(this.velocity.x, this.velocity.y);
-    v.y += this.gravity;
+    let acceleration = new Vector2(0, 0);
+    acceleration.y += this.gravity;
 
-    if(v.x > 0) {
-      if (v.x > this.size.x) {
-        v.x += -v.x * this.drag;
-      } else {
-        v.x = 0;
-      }
-    }
-    if(v.x < 0) {
-      if(v.x < -this.size.x) {
-        v.x -= v.x * this.drag;
-      } else {
-        v.x = 0;
-      }
-    }
-    
-    const idxPos = (x, y) => {
-      return (Math.floor(y / 32) * 60) + Math.floor(x / 32);
-    };
-
-    if (this.input.UP) {
-      // v.y -= this.speed.y;
-      if (v.y === 0) {
-        v.y = -this.speed.y * 50;
-      }
-    }
-    if (this.input.DOWN) {
-      // v.y += this.speed.y;
-    }
     if (this.input.LEFT) {
-      v.x -= this.speed.x;
+      acceleration.x -= this.speed.x;
+    } else if (this.velocity.x < 0) {
+      acceleration.x += this.speed.x * this.drag;
     }
     if (this.input.RIGHT) {
-      v.x += this.speed.x;
+      acceleration.x += this.speed.x;
+    } else if (this.velocity.x > 0) {
+      acceleration.x -= this.speed.x * this.drag;
+    }
+    if (this.input.UP && this.grounded) {
+      acceleration.y = -this.jump;
+      this.grounded = false;
     }
 
-    this.velocity.x += v.x * delta
-    this.velocity.y += v.y * delta
+    let deltaA = new Vector2(delta * acceleration.x, delta * acceleration.y);
     
-    // Check prodicted path
-    this.projected.x = this.position.x + this.velocity.x;
-    this.projected.y = this.position.y + this.velocity.y;
+    if (deltaA.x > 0 && deltaA.x > this.maxSpeed.x) {
+      deltaA.x = this.maxSpeed.x;
+    } else if (deltaA.x < 0 && deltaA.x < -this.maxSpeed.x) {
+      deltaA.x = -this.maxSpeed.x;
+    }
 
-    if (this.projected.y > 300) {
-      this.velocity.y = 0;
-    } 
+    if (deltaA.y > 0 && deltaA.y > this.maxSpeed.y) {
+      deltaA.y = this.maxSpeed.y;
+    } else if (deltaA.y < 0 && deltaA.y < -this.maxSpeed.y) {
+      deltaA.y = -this.maxSpeed.y;
+    }
 
-    // this.position.x += v.x * delta; 
-    // this.position.y += v.y * delta;
+    this.position.x += this.velocity.x;
+    this.velocity.x += delta * acceleration.x;
+    this.position.y += this.velocity.y;
+    this.velocity.y += delta * acceleration.y;
+
+    let gridpos = this.level.positionToGrid(this.position);
+    let collisionCurrent = this.level.getCollisionValue(gridpos.x, gridpos.y);
+    let collisionRight = this.level.getCollisionValue(gridpos.x + 1, gridpos.y);
+    let collisionDown = this.level.getCollisionValue(gridpos.x, gridpos.y + 1);
+    
+    if (this.velocity.y > 0) {
+      if (collisionDown && !collisionCurrent) {
+        this.velocity.y = 0;
+        this.grounded = true;
+      }
+    } else if (this.velocity.y < 0) {
+      if (collisionCurrent && !collisionDown) {
+        this.velocity.y = 0;
+      }
+    }
+
+    if (this.velocity.x > 0) {
+      if (collisionRight && !collisionCurrent) {
+        this.velocity.x = 0;
+      }
+    } else if (this.velocity.x < 0) {
+      if (collisionCurrent && !collisionRight) {
+        this.velocity.x = 0;
+      }
+    }
+
   }
 
   /**
@@ -89,7 +104,7 @@ class Player { // eslint-disable-line no-unused-vars
    */
   render(context, viewOffset) {
 
-    this.__renderDebug(context, viewOffset);
+    // this.__renderDebug(context, viewOffset);
 
     context.fillStyle = '#FFFF00';
     context.fillRect(
@@ -101,18 +116,7 @@ class Player { // eslint-disable-line no-unused-vars
   }
 
   __renderDebug(context, viewOffset) {
-    let posX = this.projected.x;
-    let posY = this.projected.y;
-    let vX =  this.size.x;
-    let vY =  this.size.y;
 
-    context.fillStyle = '#FF0000';
-    context.fillRect(
-      posX - viewOffset.x,
-      posY - viewOffset.y,
-      vX,
-      vY
-    );
   }
 
 }
