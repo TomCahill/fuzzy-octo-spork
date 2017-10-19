@@ -39,13 +39,16 @@ html, body {
   bottom: 20px;
 }
 
-#mobile-controls .control-movement {
+#mobile-controls .control-movement-left {
   left: 20px;
 }
-#mobile-controls .control-movement .movement-up {
+#mobile-controls .control-movement-right {
+  right: 20px;
+}
+/* #mobile-controls .control-movement .movement-up {
   display: block;
   margin: 0 auto 3px;
-}
+} */
 #mobile-controls .control-interaction {
   right: 20px;
 }
