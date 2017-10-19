@@ -74,6 +74,11 @@ class Input { // eslint-disable-line no-unused-vars
     let className = ev.target.className;
     const input = this.mobileMap[className];
     this[input] = 1;
+
+    ev.preventDefault && ev.preventDefault();
+    ev.stopPropagation && ev.stopPropagation();
+    ev.cancelBubble = true;
+    ev.returnValue = false;
   }
 
   /**
@@ -85,6 +90,11 @@ class Input { // eslint-disable-line no-unused-vars
     let className = ev.target.className;
     const input = this.mobileMap[className];
     this[input] = 0;
+
+    ev.preventDefault && ev.preventDefault();
+    ev.stopPropagation && ev.stopPropagation();
+    ev.cancelBubble = true;
+    ev.returnValue = false;
   }
 
   /**
