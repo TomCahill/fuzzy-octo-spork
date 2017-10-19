@@ -90,6 +90,18 @@ class Level { // eslint-disable-line no-unused-vars
       .catch((err) => console.error(err));
   }
 
+  positionToGrid(v) {
+    return new Vector2(Math.floor(v.x / this.tileSize), Math.floor(v.y / this.tileSize));
+  }
+  
+  gridToPosition(x, y) {
+    return new Vector2(x * this.tileSize, y * this.tileSize);
+  }
+
+  getCollisionValue(x, y) {
+    return this.collisionMap[x + (y * this.size.x)];
+  }
+
   /**
    *
    * @param {object} data - Loaded json map data
@@ -184,7 +196,7 @@ class Level { // eslint-disable-line no-unused-vars
 
       postion.x -= viewOffset.x;
       postion.y -= viewOffset.y;
-      
+
       context.drawImage(
         this._levelTileSet, // Image
         tilemap.x, // dX
@@ -196,6 +208,18 @@ class Level { // eslint-disable-line no-unused-vars
         tileSize, // sWidth
         tileSize // sHeight
       );
+
+      context.lineWidth = '1px';
+      context.strokeStyle = '#FF0000';
+      context.strokeRect(postion.x, postion.y, tileSize, tileSize);
+
+      // context.font = '12px Arial';
+      // context.fillStyle = '#FFF';
+      // context.fillText(i, postion.x + 5, postion.y + 15);
+
+      // context.font = '8px Arial';
+      // context.fillStyle = '#FFF';
+      // context.fillText(Math.floor(i / this.size.x) * 64, postion.x + 5, postion.y + 25);
     }
   }
 

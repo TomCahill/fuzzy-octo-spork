@@ -1,122 +1,144 @@
 'use strict';
 
 /** Class Object */
-class Player extends Block { // eslint-disable-line no-unused-vars
+class Player { // eslint-disable-line no-unused-vars
 
   /**
    * Object constructor
    */
   constructor(input, level) {
     console.log('Player:constructor');
-    super();
 
     this.input = input;
     this.level = level;
 
     this.position = new Vector2(level.startPosition.x, level.startPosition.y);
+    this.size = new Vector2(32, 32);
 
-    this.speed = new Vector2(100, 5);
+    this.speed = new Vector2(5, 10);
     this.velocity = new Vector2(0, 0);
 
-    this.drag = 0.4;
+    this.maxSpeed = new Vector2(8, 20);
+
+    this.grounded = false;
+
+    this.jump = 250;
+    this.drag = 0.8;
+    this.gravity = 5;
+    this.bounce = 0.3;
   }
 
   /**
    *
    */
   update(delta) {
-    super.update(delta);
+    // super.update(delta);
+
+    const lastVolocity = new Vector2(this.velocity.x, this.velocity.y);
     
-    let v = this.velocity;
+    let acceleration = new Vector2(0, 0);
+    acceleration.y += this.gravity;
 
-    if(v.x > 0) {
-      if (v.x > this.size.x) {
-        v.x += -v.x * this.drag;
-      } else {
-        v.x = 0;
-      }
-    }
-    if(v.x < 0) {
-      if(v.x < -this.size.x) {
-        v.x -= v.x * this.drag;
-      } else {
-        v.x = 0;
-      }
-    }
-    
-    const idxPos = (x, y) => {
-      return (Math.floor(y / 32) * 60) + Math.floor(x / 32);
-    };
-
-    const sideIdx = {
-      top: idxPos(this.position.x, this.position.y),
-      bottom: idxPos(this.position.x, this.position.y + this.size.y),
-      left: idxPos(this.position.x, this.position.y),
-      right: idxPos(this.position.x + this.size.x, this.position.y)
-    };  
-
-    if (this.level.collisionMap[sideIdx.top]) {
-      let colSideBottom = Math.floor(sideIdx.top / 60) * 32 + 32;
-      if (this.position.y < colSideBottom) {
-        this.position.y = colSideBottom;
-        v.y = 0;
-        return;
-      }
-    }
-    if (this.level.collisionMap[sideIdx.bottom] === 1) {
-      let colSideTop = Math.floor(sideIdx.bottom / 60) * 32 + 32;
-      if (v.y > this.size.y) {
-        v.y *= -this.bounce;
-      } else {
-        v.y = 0;
-      }
-      if (this.position.y > colSideTop) {
-        this.position.y = colSideTop;
-        v.y = 0;
-        return;
-      }
-    }
-    if (this.level.collisionMap[sideIdx.left]) {
-      let colSideRight = sideIdx.right % 60 * 32;
-      if (this.position.x < colSideRight) {
-        this.position.x = colSideRight;
-        v.x = 0;
-        return;
-      }
-    }
-    if (this.level.collisionMap[sideIdx.right]) {
-      let colSideLeft = sideIdx.right % 60 * 32 - 32;
-      if (this.position.x > colSideLeft) {
-        this.position.x = colSideLeft;
-        v.x = 0;
-        return;
-      }
-    }
-
-    if (this.input.UP) {
-      // v.y -= this.speed.y;
-      if (v.y === 0) {
-        v.y = -this.speed.y * 50;
-      }
-    }
-    if (this.input.DOWN) {
-      // v.y += this.speed.y;
-    }
     if (this.input.LEFT) {
-      v.x -= this.speed.x;
+      acceleration.x -= (this.grounded) ? this.speed.x : this.speed.x/2;
+    } else if (this.velocity.x < 0) {
+      acceleration.x += this.speed.x * this.drag;
     }
     if (this.input.RIGHT) {
-      v.x += this.speed.x;
+      acceleration.x += (this.grounded) ? this.speed.x : this.speed.x/2;
+    } else if (this.velocity.x > 0) {
+      acceleration.x -= this.speed.x * this.drag;
+    }
+    if (this.input.UP && this.grounded) {
+      acceleration.y = -this.jump;
+      this.grounded = false;
     }
 
-    this.position.x += v.x * delta; 
-    this.position.y += v.y * delta;
+    let deltaA = new Vector2(delta * acceleration.x, delta * acceleration.y);
+
+    this.position.x += this.velocity.x;
+    this.velocity.x += delta * acceleration.x;
+    this.position.y += this.velocity.y;
+    this.velocity.y += delta * acceleration.y;
+
+    if (
+      (this.lastVolocity < 0 && this.volocity.x > 0) ||
+      (this.lastVolocity > 0 && this.volocity.x < 0)
+    ) {
+      console.log('Kappa');
+      this.volocity.x = 0;
+    }
+
+    if (this.velocity.x > 0 && this.velocity.x > this.maxSpeed.x) {
+      this.velocity.x = this.maxSpeed.x;
+    } else if (this.velocity.x < 0 && this.velocity.x < -this.maxSpeed.x) {
+      this.velocity.x = -this.maxSpeed.x;
+    }
+
+    if (this.velocity.y > 0 && this.velocity.y > this.maxSpeed.y) {
+      this.velocity.y = this.maxSpeed.y;
+    } else if (this.velocity.y < 0 && this.velocity.y < -this.maxSpeed.y) {
+      this.velocity.y = -this.maxSpeed.y;
+    }
+
+    let gridpos = this.level.positionToGrid(this.position);
+    let collisionCurrent = this.level.getCollisionValue(gridpos.x, gridpos.y);
+    let collisionHorz = this.level.getCollisionValue(gridpos.x + 1, gridpos.y);
+    let collisionVert = this.level.getCollisionValue(gridpos.x, gridpos.y + 1);
+    let collisionDiag = this.level.getCollisionValue(gridpos.x + 1, gridpos.y + 1);
+
+    let tileOffset = new Vector2(this.position.x % this.level.tileSize, this.position.y % this.level.tileSize);
+    
+    if (this.velocity.y > 0) {
+      if (
+        (collisionVert && !collisionCurrent) ||
+        (collisionDiag && !collisionHorz && tileOffset.x)
+      ) {
+        this.position.y = this.level.gridToPosition(gridpos.x, gridpos.y).y;
+        this.velocity.y = 0;
+        tileOffset.y = 0;
+        this.grounded = true;
+      }
+    } else if (this.velocity.y < 0) {
+      if (
+        (collisionCurrent && !collisionVert) ||
+        (collisionHorz && !collisionDiag && tileOffset.x)
+      ){
+        this.position.y = this.level.gridToPosition(gridpos.x, gridpos.y + 1).y;
+        this.velocity.y = 0;
+        tileOffset.y = 0;
+        collisionCurrent = collisionVert;
+        collisionHorz = collisionDiag;
+      }
+    }
+
+    if (this.velocity.x > 0) {
+      if (
+        (collisionHorz && !collisionCurrent) ||
+        (collisionDiag && !collisionVert && tileOffset.y)
+      ) {
+        this.position.x = this.level.gridToPosition(gridpos.x, gridpos.y).x;
+        this.velocity.x = 0;
+      }
+    } else if (this.velocity.x < 0) {
+      if (
+        (collisionCurrent && !collisionHorz) ||
+        (collisionVert && !collisionDiag && tileOffset.y)
+      ) {
+        this.position.x = this.level.gridToPosition(gridpos.x + 1, gridpos.y).x;
+        this.velocity.x = 0;
+      }
+    }
+
   }
 
   /**
    *
    */
   render(context, viewOffset) {
+
+    // this.__renderDebug(context, viewOffset);
+
     context.fillStyle = '#FFFF00';
     context.fillRect(
       this.position.x - viewOffset.x,
@@ -124,6 +146,10 @@ class Player extends Block { // eslint-disable-line no-unused-vars
       this.size.x,
       this.size.y
     );
+  }
+
+  __renderDebug(context, viewOffset) {
+
   }
 
 }
