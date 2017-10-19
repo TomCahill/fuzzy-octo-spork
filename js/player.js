@@ -18,12 +18,12 @@ class Player { // eslint-disable-line no-unused-vars
     this.speed = new Vector2(5, 10);
     this.velocity = new Vector2(0, 0);
 
-    this.maxSpeed = new Vector2(20, 60);
+    this.maxSpeed = new Vector2(8, 20);
 
     this.grounded = false;
 
-    this.jump = 300;
-    this.drag = 0.4;
+    this.jump = 250;
+    this.drag = 0.8;
     this.gravity = 5;
     this.bounce = 0.3;
   }
@@ -33,17 +33,19 @@ class Player { // eslint-disable-line no-unused-vars
    */
   update(delta) {
     // super.update(delta);
+
+    const lastVolocity = new Vector2(this.velocity.x, this.velocity.y);
     
     let acceleration = new Vector2(0, 0);
     acceleration.y += this.gravity;
 
     if (this.input.LEFT) {
-      acceleration.x -= this.speed.x;
+      acceleration.x -= (this.grounded) ? this.speed.x : this.speed.x/2;
     } else if (this.velocity.x < 0) {
       acceleration.x += this.speed.x * this.drag;
     }
     if (this.input.RIGHT) {
-      acceleration.x += this.speed.x;
+      acceleration.x += (this.grounded) ? this.speed.x : this.speed.x/2;
     } else if (this.velocity.x > 0) {
       acceleration.x -= this.speed.x * this.drag;
     }
@@ -53,46 +55,77 @@ class Player { // eslint-disable-line no-unused-vars
     }
 
     let deltaA = new Vector2(delta * acceleration.x, delta * acceleration.y);
-    
-    if (deltaA.x > 0 && deltaA.x > this.maxSpeed.x) {
-      deltaA.x = this.maxSpeed.x;
-    } else if (deltaA.x < 0 && deltaA.x < -this.maxSpeed.x) {
-      deltaA.x = -this.maxSpeed.x;
-    }
-
-    if (deltaA.y > 0 && deltaA.y > this.maxSpeed.y) {
-      deltaA.y = this.maxSpeed.y;
-    } else if (deltaA.y < 0 && deltaA.y < -this.maxSpeed.y) {
-      deltaA.y = -this.maxSpeed.y;
-    }
 
     this.position.x += this.velocity.x;
     this.velocity.x += delta * acceleration.x;
     this.position.y += this.velocity.y;
     this.velocity.y += delta * acceleration.y;
 
+    if (
+      (this.lastVolocity < 0 && this.volocity.x > 0) ||
+      (this.lastVolocity > 0 && this.volocity.x < 0)
+    ) {
+      console.log('Kappa');
+      this.volocity.x = 0;
+    }
+
+    if (this.velocity.x > 0 && this.velocity.x > this.maxSpeed.x) {
+      this.velocity.x = this.maxSpeed.x;
+    } else if (this.velocity.x < 0 && this.velocity.x < -this.maxSpeed.x) {
+      this.velocity.x = -this.maxSpeed.x;
+    }
+
+    if (this.velocity.y > 0 && this.velocity.y > this.maxSpeed.y) {
+      this.velocity.y = this.maxSpeed.y;
+    } else if (this.velocity.y < 0 && this.velocity.y < -this.maxSpeed.y) {
+      this.velocity.y = -this.maxSpeed.y;
+    }
+
     let gridpos = this.level.positionToGrid(this.position);
     let collisionCurrent = this.level.getCollisionValue(gridpos.x, gridpos.y);
-    let collisionRight = this.level.getCollisionValue(gridpos.x + 1, gridpos.y);
-    let collisionDown = this.level.getCollisionValue(gridpos.x, gridpos.y + 1);
+    let collisionHorz = this.level.getCollisionValue(gridpos.x + 1, gridpos.y);
+    let collisionVert = this.level.getCollisionValue(gridpos.x, gridpos.y + 1);
+    let collisionDiag = this.level.getCollisionValue(gridpos.x + 1, gridpos.y + 1);
+
+    let tileOffset = new Vector2(this.position.x % this.level.tileSize, this.position.y % this.level.tileSize);
     
     if (this.velocity.y > 0) {
-      if (collisionDown && !collisionCurrent) {
+      if (
+        (collisionVert && !collisionCurrent) ||
+        (collisionDiag && !collisionHorz && tileOffset.x)
+      ) {
+        this.position.y = this.level.gridToPosition(gridpos.x, gridpos.y).y;
         this.velocity.y = 0;
+        tileOffset.y = 0;
         this.grounded = true;
       }
     } else if (this.velocity.y < 0) {
-      if (collisionCurrent && !collisionDown) {
+      if (
+        (collisionCurrent && !collisionVert) ||
+        (collisionHorz && !collisionDiag && tileOffset.x)
+      ){
+        this.position.y = this.level.gridToPosition(gridpos.x, gridpos.y + 1).y;
         this.velocity.y = 0;
+        tileOffset.y = 0;
+        collisionCurrent = collisionVert;
+        collisionHorz = collisionDiag;
       }
     }
 
     if (this.velocity.x > 0) {
-      if (collisionRight && !collisionCurrent) {
+      if (
+        (collisionHorz && !collisionCurrent) ||
+        (collisionDiag && !collisionVert && tileOffset.y)
+      ) {
+        this.position.x = this.level.gridToPosition(gridpos.x, gridpos.y).x;
         this.velocity.x = 0;
       }
     } else if (this.velocity.x < 0) {
-      if (collisionCurrent && !collisionRight) {
+      if (
+        (collisionCurrent && !collisionHorz) ||
+        (collisionVert && !collisionDiag && tileOffset.y)
+      ) {
+        this.position.x = this.level.gridToPosition(gridpos.x + 1, gridpos.y).x;
         this.velocity.x = 0;
       }
     }

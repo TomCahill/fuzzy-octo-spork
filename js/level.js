@@ -93,6 +93,10 @@ class Level { // eslint-disable-line no-unused-vars
   positionToGrid(v) {
     return new Vector2(Math.floor(v.x / this.tileSize), Math.floor(v.y / this.tileSize));
   }
+  
+  gridToPosition(x, y) {
+    return new Vector2(x * this.tileSize, y * this.tileSize);
+  }
 
   getCollisionValue(x, y) {
     return this.collisionMap[x + (y * this.size.x)];
