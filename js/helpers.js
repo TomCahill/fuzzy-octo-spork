@@ -29,4 +29,10 @@ class Vector2 { // eslint-disable-line no-unused-vars
     return `${this.x}:${this.y}`;
   }
 
+  clamp(min, max) {
+    this.x = Math.min(Math.max(this.x, min), max);
+    this.y = Math.min(Math.max(this.y, min), max);
+    return self;
+  }
+
 }

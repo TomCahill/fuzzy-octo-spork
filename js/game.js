@@ -115,7 +115,7 @@ class Game { // eslint-disable-line no-unused-vars
       this._deltaTime = (now - this._lastTick) / 1000;
       try {
         this._update(this._deltaTime);
-      } catch(e) {  
+      } catch(e) {
         console.error(e);
         this.stop();
       }
@@ -206,9 +206,10 @@ class Game { // eslint-disable-line no-unused-vars
     context.fillText(`CanvasSize:: ${this.canvas.size}`, 20, 30);
     context.fillText(`ViewPort: ${this.viewPort.offset}`, 20, 50);
     context.fillText(`FPS: ${this._fps}`, 20, 70);
+    context.fillText(`Delta: ${this._deltaTime}`, 20, 90);
 
-    context.fillText(`Position: ${this.player.position}`, 20, 100);
-    context.fillText(`Velocity: ${this.player.velocity}`, 20, 120);
+    context.fillText(`Position: ${this.player.position}`, 20, 120);
+    context.fillText(`Velocity: ${this.player.velocity}`, 20, 140);
     // context.fillText(`Projected: ${this.player.projected}`, 20, 140);
   }
 

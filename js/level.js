@@ -111,14 +111,14 @@ class Level { // eslint-disable-line no-unused-vars
   _parseLevel(data) {
     // console.log('Level:_parseLevel', data);
     this._levelData = data;
-    this._levelTileSet = new Image();
-    this._levelTileSet.src = this._levelData.tilesets[0].image;
 
     this.tileSize = this._levelData.tilewidth;
     this.size = new Vector2(this._levelData.width, this._levelData.height);
+    
+    this._levelTileSet = new Image();
+    this._levelTileSet.src = this._levelData.tilesets[0].image;
 
-    // Parse out object layers
-    return data.layers.reduce((layers, layer) => {
+    const layers = data.layers.reduce((layers, layer) => {
       if (layer.properties) {
         if (layer.properties.collision) {
           this.collisionMap = layer.data.map((i) => (i > 0) ? 1 : 0);
@@ -128,6 +128,15 @@ class Level { // eslint-disable-line no-unused-vars
       layers.push(layer);
       return layers;
     }, []);
+
+    return new Promise((resolve, reject) => {
+      this._levelTileSet.addEventListener('load', () => {
+        resolve(layers);
+      });
+      this._levelTileSet.addEventListener('error', (err) => {
+        reject(err);
+      })
+    });
   }
 
   /**
@@ -210,7 +219,7 @@ class Level { // eslint-disable-line no-unused-vars
       );
 
       context.lineWidth = '1px';
-      context.strokeStyle = '#FF0000';
+      context.strokeStyle = 'rgba(0,0,0,0.1)';
       context.strokeRect(postion.x, postion.y, tileSize, tileSize);
 
       // context.font = '12px Arial';

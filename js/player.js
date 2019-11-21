@@ -16,7 +16,9 @@ class Player { // eslint-disable-line no-unused-vars
     this.size = new Vector2(32, 32);
 
     this.speed = new Vector2(5, 10);
-    this.velocity = new Vector2(0, 0);
+    this.velocity = new Vector2(-1, 0);
+
+    this._vectorClamp = .007;
 
     this.maxSpeed = new Vector2(8, 20);
 
@@ -42,45 +44,48 @@ class Player { // eslint-disable-line no-unused-vars
     if (this.input.LEFT) {
       acceleration.x -= (this.grounded) ? this.speed.x : this.speed.x/2;
     } else if (this.velocity.x < 0) {
-      acceleration.x += this.speed.x * this.drag;
+      if (this.velocity.x > this.drag) {
+        acceleration.x -= this.velocity.x * this.drag;
+      } else {
+        acceleration.x = -this.velocity.x;
+      }
     }
-    if (this.input.RIGHT) {
-      acceleration.x += (this.grounded) ? this.speed.x : this.speed.x/2;
-    } else if (this.velocity.x > 0) {
-      acceleration.x -= this.speed.x * this.drag;
-    }
-    if (this.input.UP && this.grounded) {
+    // if (this.input.RIGHT) {
+    //   acceleration.x += (this.grounded) ? this.speed.x : this.speed.x/2;
+    // } else if (this.velocity.x > 0) {
+    //   acceleration.x -= this.speed.x * this.drag;
+    // }
+    if (this.input.JUMP && this.grounded) {
       acceleration.y = -this.jump;
       this.grounded = false;
     }
 
-    let deltaA = new Vector2(delta * acceleration.x, delta * acceleration.y);
+    if (acceleration.x < 0) {
+      acceleration.clamp(-this._vectorClamp, -3000);
+    }
+    if (acceleration.x > 0) {
+      acceleration.clamp(this._vectorClamp, 3000);
+    }
 
-    this.position.x += this.velocity.x;
     this.velocity.x += delta * acceleration.x;
-    this.position.y += this.velocity.y;
     this.velocity.y += delta * acceleration.y;
 
-    if (
-      (this.lastVolocity < 0 && this.volocity.x > 0) ||
-      (this.lastVolocity > 0 && this.volocity.x < 0)
-    ) {
-      console.log('Kappa');
-      this.volocity.x = 0;
-    }
+    this.position.x += this.velocity.x;
+    this.position.y += this.velocity.y;
 
-    if (this.velocity.x > 0 && this.velocity.x > this.maxSpeed.x) {
-      this.velocity.x = this.maxSpeed.x;
-    } else if (this.velocity.x < 0 && this.velocity.x < -this.maxSpeed.x) {
-      this.velocity.x = -this.maxSpeed.x;
-    }
+    // if (this.velocity.x > 0 && this.velocity.x > this.maxSpeed.x) {
+    //   this.velocity.x = this.maxSpeed.x;
+    // } else if (this.velocity.x < 0 && this.velocity.x < -this.maxSpeed.x) {
+    //   this.velocity.x = -this.maxSpeed.x;
+    // }
 
-    if (this.velocity.y > 0 && this.velocity.y > this.maxSpeed.y) {
-      this.velocity.y = this.maxSpeed.y;
-    } else if (this.velocity.y < 0 && this.velocity.y < -this.maxSpeed.y) {
-      this.velocity.y = -this.maxSpeed.y;
-    }
+    // if (this.velocity.y > 0 && this.velocity.y > this.maxSpeed.y) {
+    //   this.velocity.y = this.maxSpeed.y;
+    // } else if (this.velocity.y < 0 && this.velocity.y < -this.maxSpeed.y) {
+    //   this.velocity.y = -this.maxSpeed.y;
+    // }
 
+    // Collision Detection & Affect
     let gridpos = this.level.positionToGrid(this.position);
     let collisionCurrent = this.level.getCollisionValue(gridpos.x, gridpos.y);
     let collisionHorz = this.level.getCollisionValue(gridpos.x + 1, gridpos.y);
