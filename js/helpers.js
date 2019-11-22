@@ -1,5 +1,11 @@
 'use strict';
 
+const Constants = {
+  METERS_PER_SECOND: 32 / 1000,
+  METER: 32,
+  KM: 1000
+};
+
 /** Class Vector2 */
 class Vector2 { // eslint-disable-line no-unused-vars
 

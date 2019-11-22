@@ -112,7 +112,7 @@ class Game { // eslint-disable-line no-unused-vars
     const now = new Date();
 
     if ((now - this._lastTick) > this._tickRate) {
-      this._deltaTime = (now - this._lastTick) / 1000;
+      this._deltaTime = (now - this._lastTick);
       try {
         this._update(this._deltaTime);
       } catch(e) {

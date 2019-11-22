@@ -13,21 +13,20 @@ class Player { // eslint-disable-line no-unused-vars
     this.level = level;
 
     this.position = new Vector2(level.startPosition.x, level.startPosition.y);
-    this.size = new Vector2(32, 32);
+    this.size = new Vector2(20, 20);
 
-    this.speed = new Vector2(5, 10);
+    console.log(Constants.METERS_PER_SECOND * 1);
+
+    this.speed = new Vector2(Constants.METERS_PER_SECOND * 0.25, 0);
     this.velocity = new Vector2(-1, 0);
 
-    this._vectorClamp = .007;
-
-    this.maxSpeed = new Vector2(8, 20);
+    this.maxSpeed = new Vector2(Constants.METERS_PER_SECOND * 5, 20);
 
     this.grounded = false;
 
-    this.jump = 250;
-    this.drag = 0.8;
-    this.gravity = 5;
-    this.bounce = 0.3;
+    this.jump = Constants.METERS_PER_SECOND * 15;
+    this.drag = Constants.METERS_PER_SECOND * 0.01;
+    this.gravity = Constants.METERS_PER_SECOND * 1;
   }
 
   /**
@@ -42,9 +41,18 @@ class Player { // eslint-disable-line no-unused-vars
     acceleration.y += this.gravity;
 
     if (this.input.LEFT) {
-      acceleration.x -= (this.grounded) ? this.speed.x : this.speed.x/2;
+      acceleration.x -= (this.grounded) ? this.speed.x : this.speed.x * this.drag;
     } else if (this.velocity.x < 0) {
       if (this.velocity.x > this.drag) {
+        acceleration.x -= this.velocity.x * this.drag;
+      } else {
+        acceleration.x = -this.velocity.x;
+      }
+    }
+    if (this.input.RIGHT) {
+      acceleration.x += (this.grounded) ? this.speed.x : this.speed.x * this.drag;
+    } else if (this.velocity.x > 0) {
+      if (this.velocity.x < this.drag) {
         acceleration.x -= this.velocity.x * this.drag;
       } else {
         acceleration.x = -this.velocity.x;
@@ -60,24 +68,17 @@ class Player { // eslint-disable-line no-unused-vars
       this.grounded = false;
     }
 
-    if (acceleration.x < 0) {
-      acceleration.clamp(-this._vectorClamp, -3000);
+    this.velocity.x += acceleration.x;
+    this.velocity.y += acceleration.y;
+
+    if (this.velocity.x > 0 && this.velocity.x > this.maxSpeed.x) {
+      this.velocity.x = this.maxSpeed.x;
+    } else if (this.velocity.x < 0 && this.velocity.x < -this.maxSpeed.x) {
+      this.velocity.x = -this.maxSpeed.x;
     }
-    if (acceleration.x > 0) {
-      acceleration.clamp(this._vectorClamp, 3000);
-    }
 
-    this.velocity.x += delta * acceleration.x;
-    this.velocity.y += delta * acceleration.y;
-
-    this.position.x += this.velocity.x;
-    this.position.y += this.velocity.y;
-
-    // if (this.velocity.x > 0 && this.velocity.x > this.maxSpeed.x) {
-    //   this.velocity.x = this.maxSpeed.x;
-    // } else if (this.velocity.x < 0 && this.velocity.x < -this.maxSpeed.x) {
-    //   this.velocity.x = -this.maxSpeed.x;
-    // }
+    this.position.x += this.velocity.x * delta;
+    this.position.y += this.velocity.y * delta;
 
     // if (this.velocity.y > 0 && this.velocity.y > this.maxSpeed.y) {
     //   this.velocity.y = this.maxSpeed.y;
