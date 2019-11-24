@@ -210,6 +210,7 @@ class Game { // eslint-disable-line no-unused-vars
 
     context.fillText(`Position: ${this.player.position}`, 20, 120);
     context.fillText(`Velocity: ${this.player.velocity}`, 20, 140);
+    context.fillText(`Collision: ${this.level.debugTileCollision}`, 20, 160);
     // context.fillText(`Projected: ${this.player.projected}`, 20, 140);
   }
 

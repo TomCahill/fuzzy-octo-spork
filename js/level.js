@@ -25,6 +25,8 @@ class Level { // eslint-disable-line no-unused-vars
     this.startPosition = new Vector2(160, 220);
 
     this.collisionMap = [];
+
+    this.debugTileCollision = [];
     
     this.layer = {
       size: new Vector2(1000, 100),
@@ -114,6 +116,9 @@ class Level { // eslint-disable-line no-unused-vars
 
     this.tileSize = this._levelData.tilewidth;
     this.size = new Vector2(this._levelData.width, this._levelData.height);
+
+    console.log('Level:_parseLevel', 'tileSize', this.tileSize);
+    console.log('Level:_parseLevel', 'size', this.size);
     
     this._levelTileSet = new Image();
     this._levelTileSet.src = this._levelData.tilesets[0].image;
@@ -175,8 +180,22 @@ class Level { // eslint-disable-line no-unused-vars
     if (!this._levelLoaded) {
       return;
     }
-    
+
     context.drawImage(this._canvasBuffer, -viewOffset.x, -viewOffset.y);
+
+    for(var i = 0; i < this.debugTileCollision.length; i++) {
+      const idx = this.debugTileCollision[i];
+      const postion = new Vector2(0, 0);
+      postion.x = (idx % this.size.x) * this.tileSize;
+      postion.y = ~~(idx / this.size.x) * this.tileSize;
+
+      postion.x -= viewOffset.x;
+      postion.y -= viewOffset.y;
+
+      context.lineWidth = '1px';
+      context.strokeStyle = 'rgba(255,0,0,1)';
+      context.strokeRect(postion.x, postion.y, this.tileSize, this.tileSize);
+    }
   }
 
   /**
